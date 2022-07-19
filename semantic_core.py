@@ -15,7 +15,7 @@ def text_cleaner(text):
 
 def load_data():
     data = { 'text':[],'tag':[] }
-    for line in open('learning.txt'):
+    for line in open('learning1.txt'):
         if(not('#' in line)):
             row = line.split("@")
             data['text'] += [row[0]]
