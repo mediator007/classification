@@ -1,6 +1,8 @@
+from operator import index
 import sys
 import numpy as np
 import re
+import pandas as pd
 import nltk.stem as Stemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import SGDClassifier
@@ -15,7 +17,7 @@ def text_cleaner(text):
 
 def load_data():
     data = { 'text':[],'tag':[] }
-    for line in open('learning1.txt'):
+    for line in open('learning.txt', encoding='utf-8'):
         if(not('#' in line)):
             row = line.split("@")
             data['text'] += [row[0]]
@@ -40,7 +42,7 @@ nb_validation_samples:] }
     }
     
 
-def openai():
+def get_prediction(file):
     data = load_data()
     D = train_test_split(data)
 
@@ -50,11 +52,17 @@ def openai():
         ])
     text_clf.fit(D['train']['x'], D['train']['x'] )
 
-    z=input('Введите слова через запятую и пробел: ')
-    zz=[]
-    zz.append(z)
-    predicted = text_clf.predict(zz)
-    print(predicted[0])
+    xl = pd.ExcelFile(file)
+    df = xl.parse('Лист1') 
+
+    predicts = []
+    for request in df['Запрос']:
+        # print(request)
+        predict = text_clf.predict([request])
+        predicts.append(predict[0])
+    
+    df['Категория'] = predicts
+    df.to_excel(file, sheet_name='Лист1', index=False)
 
 if __name__ == '__main__':
-    sys.exit(openai())
+    sys.exit(get_prediction('requests.xlsx'))
