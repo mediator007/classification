@@ -7,5 +7,5 @@ def prediction(question):
     return answer
 
 if __name__=='__main__':
-    ...
+    print('Answer --- ', prediction('iaas'))
     
