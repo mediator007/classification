@@ -2,7 +2,6 @@ from operator import index
 import sys
 import numpy as np
 import re
-import pandas as pd
 import nltk.stem as Stemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import SGDClassifier
