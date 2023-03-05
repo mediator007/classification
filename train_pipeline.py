@@ -7,6 +7,8 @@ import nltk.stem as Stemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import SGDClassifier
 from sklearn.pipeline import Pipeline
+from sklearn import metrics, svm
+import joblib
 
 def text_cleaner(text):
     text = text.lower()
@@ -32,37 +34,43 @@ def train_test_split( data, validation_split = 0.1):
     X = [ data['text'][i] for i in indices ]
     Y = [ data['tag'][i] for i in indices ]
     nb_validation_samples = int(validation_split * sz)
-    return {
-        'train': { 'x': X[:-
-nb_validation_samples], 'y': Y[:-
-nb_validation_samples] },
-        'text': {'x': X[-
-nb_validation_samples:], 'y': Y[-
-nb_validation_samples:] }
+    result =  {
+        'train': {
+            'x': X[:-nb_validation_samples], 
+            'y': Y[:-nb_validation_samples]
+            },
+        'test': {
+            'x': X[-nb_validation_samples:], 
+            'y': Y[-nb_validation_samples:]
+            },
+        'all': {
+            'x': X[:], 
+            'y': Y[:]
+            },
     }
+    return result
     
 
-def get_prediction(file):
+def get_prediction():
     data = load_data()
     D = train_test_split(data)
 
-    text_clf = Pipeline([
+    pipeline = Pipeline([
         ('tfidf',TfidfVectorizer(use_idf=True)), # try stopwords = ..., vocabulary = ... .
         ('clf',SGDClassifier(loss='hinge')), # try parametres
         ])
-    text_clf.fit(D['train']['x'], D['train']['x'] )
+    pipeline.fit(D['all']['x'], D['all']['y'])
 
-    xl = pd.ExcelFile(file)
-    df = xl.parse('Лист1') 
+    joblib.dump(pipeline, 'pipeline.pkl', compress = 1)
+    pipeline = joblib.load('pipeline.pkl')
 
-    predicts = []
-    for request in df['Запрос']:
-        # print(request)
-        predict = text_clf.predict([request])
-        predicts.append(predict[0])
-    
-    df['Категория'] = predicts
-    df.to_excel(file, sheet_name='Лист1', index=False)
+    # check pipeline
+    predict = pipeline.predict(["заказать iaas"])[0]
+    print(predict)
+
+    # https://habr.com/ru/post/538458/
+    # predicted_sgd = pipeline.predict(D['test']['x'])
+    # print(metrics.classification_report(predicted_sgd, D['test']['y']))
 
 if __name__ == '__main__':
-    sys.exit(get_prediction('requests.xlsx'))
+    sys.exit(get_prediction())
