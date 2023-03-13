@@ -134,3 +134,7 @@ learningBot.txt
 База знаний.xlsx
 
 pipeline.pkl
+t5_venv
+
+data.xlsx
+model.h5

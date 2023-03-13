@@ -2,7 +2,9 @@ from operator import index
 import sys
 import numpy as np
 import re
-import nltk.stem as Stemmer
+
+from nltk.stem.snowball import SnowballStemmer
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import SGDClassifier
 from sklearn.pipeline import Pipeline
@@ -11,8 +13,8 @@ import joblib
 
 def text_cleaner(text):
     text = text.lower()
-    stemmer = Stemmer('russian')
-    text = ' '.join( stemmer.stemWords(text.split() ) )
+    stemmer = SnowballStemmer('russian')
+    text = ' '.join( [stemmer.stem(word) for word in text.split()] )
     text = re.sub( r'\b\d+\b', ' digit ', text )
     return text
 
@@ -21,7 +23,10 @@ def load_data():
     for line in open('learning.txt', encoding='utf-8'):
         if(not('#' in line)):
             row = line.split("@")
-            data['text'] += [row[0]]
+
+            data['text'] += [text_cleaner(row[0])]
+            print(data['text'])
+
             data['tag'] += [row[1]]
     return data
 
@@ -64,7 +69,7 @@ def get_prediction():
     pipeline = joblib.load('pipeline.pkl')
 
     # check pipeline
-    predict = pipeline.predict(["заказать iaas"])[0]
+    predict = pipeline.predict(["hi !!!"])[0]
     print(predict)
 
     # https://habr.com/ru/post/538458/
