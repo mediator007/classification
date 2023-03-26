@@ -15,6 +15,6 @@ https://habr.com/ru/post/581932/
 
 - Запустить скрипт t5-predict.py или использовать функцию answer для получения ответа на запрос
 
-
-
+### Dataset
+https://github.com/Koziev/NLP_Datasets
 

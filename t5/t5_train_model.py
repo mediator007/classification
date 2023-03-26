@@ -1,5 +1,6 @@
 # pip install transformers sentencepiece torch pandas openpyxl
 import pandas as pd
+from random import shuffle
 
 import torch
 from transformers import T5ForConditionalGeneration, T5Tokenizer
@@ -8,24 +9,26 @@ from tqdm.auto import trange
 import random
 import numpy as np
 
-raw_model = 'cointegrated/rut5-base-multitask' 
+# raw_model = './rut5-base-multitask'
+raw_model = 'C:/Users/User/Desktop/Programming/classification/t5/rut5-base' 
 # use .cuda() if cuda install from
 # https://developer.nvidia.com/cuda-downloads
 # for training on GPU
-model = T5ForConditionalGeneration.from_pretrained(raw_model)#.cuda()
+model = T5ForConditionalGeneration.from_pretrained(raw_model).cuda()
 tokenizer = T5Tokenizer.from_pretrained(raw_model)
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-5)
 
 
-batch_size = 8  # сколько примеров показываем модели за один шаг
+batch_size = 16  # сколько примеров показываем модели за один шаг
 report_steps = 200  # раз в сколько шагов печатаем результат
-epochs = 25  # сколько раз мы покажем данные модели
+epochs = 8  # сколько раз мы покажем данные модели
 
 
-data = pd.read_excel('data.xlsx', usecols=['Questions', 'Answers']) # usecols - names of columns in xlsx
-text = data['A'].tolist()
-labels = data['B'].tolist()
+data = pd.read_excel('data3.xlsx', usecols=['Questions', 'Answers']) # usecols - names of columns in xlsx
+text = data['Questions'].tolist()
+labels = data['Answers'].tolist()
 pairs = [(text[i], labels[i]) for i in range(len(text))]
+shuffle(pairs)
 
 model.train()
 losses = []
@@ -58,6 +61,6 @@ for epoch in range(epochs):
 
 
 
-new_model_name = 'rut5-model'  # название папки для сохранения
+new_model_name = 'rut5-model-3'  # название папки для сохранения
 model.save_pretrained(new_model_name)
 tokenizer.save_pretrained(new_model_name)

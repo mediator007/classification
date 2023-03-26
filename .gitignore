@@ -137,4 +137,13 @@ pipeline.pkl
 t5_venv
 
 data.xlsx
+data2.xlsx
+data3.xlsx
+dialog.txt
 model.h5
+
+rut5-model-3
+rut5-base
+rut5-base-multitask
+
+dialogs.txt
